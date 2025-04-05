@@ -15,16 +15,20 @@ import { toast } from 'sonner'
 const LectureTab = () => {
   const params=useParams();
   const {courseId,lectureId}=params;
+//   const [avoidSelectedLecture, setAvoidSelectedLecture] = useState(false);
   const {lecture}=useSelector(store=>store.lecture);
-  const selectedLecture=lecture.find(lecture=>lecture._id===lectureId);
-
-  const [lectureTitle, setLectureTitle] = useState(selectedLecture.lectureTitle);
+  const selectedLecture = Array.isArray(lecture)
+  ? lecture.find((lecture) => lecture._id === lectureId)
+  : null;
+  console.log("Selected lecture:",selectedLecture);
+  const [lectureTitle, setLectureTitle] = useState(selectedLecture?.lectureTitle);
   const [uploadVideoInfo, setUploadVideoInfo] = useState(null);
-  const [isFree, setIsFree] = useState(selectedLecture.isPreviewFree);
+  const [isFree, setIsFree] = useState(selectedLecture?.isPreviewFree);
   const [mediaProgress, setMediaProgress] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [loading, setLoading] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
+  const [lectureUploadLoading, setLectureUploadLoading] = useState(false);
 
   const navigate=useNavigate();
   const dispatch=useDispatch();
@@ -38,6 +42,7 @@ const LectureTab = () => {
         formData.append('file',file);
 
         setMediaProgress(true);
+        setLectureUploadLoading(true);
 
         try {
             const res=await axios.post(`http://localhost:3000/api/v1/media/upload-video`,formData,{
@@ -47,13 +52,13 @@ const LectureTab = () => {
             })
 
             if(res.data.success){
-                // console.log("Video upload response:",res.data);
-                setUploadVideoInfo({
-                    videoUrl:res.data.data.url,
-                    publicId:res.data.data.public_id,
-                    
-                })
-               // console.log("Video upload info:",uploadVideoInfo);
+                console.log("Video upload response:",res.data);
+                const videoInfo = {
+                    videoUrl: res.data.data.url,
+                    publicId: res.data.data.public_id,
+                };
+                console.log("Video upload info:",videoInfo);
+                setUploadVideoInfo(videoInfo);
                
                 toast.success(res.data.message);
             }
@@ -64,6 +69,7 @@ const LectureTab = () => {
         }
         finally{
             setMediaProgress(false);
+            setLectureUploadLoading(false);
         }
     }
   }
@@ -76,29 +82,32 @@ const LectureTab = () => {
       videoInfo: uploadVideoInfo || selectedLecture.videoInfo,
       isPreviewFree: isFree,
     };
-  
-    try {
-      setLoading(true);
-      const res = await axios.post(
-        `http://localhost:3000/api/v1/course/${courseId}/lecture/${lectureId}`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
+
+    if (!lectureUploadLoading){
+        try {
+          setLoading(true);
+          const res = await axios.post(
+            `http://localhost:3000/api/v1/course/${courseId}/lecture/${lectureId}`,
+            data,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              withCredentials: true,
+            }
+          );
+      
+          if (res.data.success) {
+            dispatch(setLecture(res.data.lecture));
+            toast.success(res.data.message);
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error("Lecture update failed");
+        } finally {
+          setLoading(false);
+          navigate(`/admin/courses/${courseId}/lectures`);
         }
-      );
-  
-      if (res.data.success) {
-        dispatch(setLecture(res.data.lecture));
-        toast.success(res.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Lecture update failed");
-    } finally {
-      setLoading(false);
     }
   };
   
@@ -170,7 +179,7 @@ const LectureTab = () => {
             )
         }
         <div className='mt-4'>
-            <Button disabled={loading} onClick={updateLectureHandler} className='bg-gray-800 hover:bg-gray-900'>
+            <Button disabled={lectureUploadLoading} onClick={updateLectureHandler} className='bg-gray-800 hover:bg-gray-900'>
                 {
                     loading ? <><Loader2 className='mr-1 h-4 w-4 animate-spin'/>Please wait..</> : "Update Lecture"
                 }

@@ -35,6 +35,9 @@ const CreateLecture = () => {
       );
       if (res.data.success) {
         toast.success(res.data.message);
+        // Update the lecture state with the newly created lecture
+        dispatch(setLecture([...lecture, res.data.lecture]));
+        setLectureTitle(""); // Clear the input field after successful creation
       } else {
         toast.error("Something went wrong");
       }
@@ -60,7 +63,7 @@ const CreateLecture = () => {
       }
     };
     getLectures();
-  }, [lecture]);
+  }, []);
   return (
     <div className="p-4 md:p-10 md:pr-20 h-screen">
       <h1 className="text-2xl font-bold mb-2">
