@@ -20,7 +20,6 @@ const LectureTab = () => {
   const selectedLecture = Array.isArray(lecture)
   ? lecture.find((lecture) => lecture._id === lectureId)
   : null;
-  console.log("Selected lecture:",selectedLecture);
   const [lectureTitle, setLectureTitle] = useState(selectedLecture?.lectureTitle);
   const [uploadVideoInfo, setUploadVideoInfo] = useState(null);
   const [isFree, setIsFree] = useState(selectedLecture?.isPreviewFree);
@@ -52,19 +51,17 @@ const LectureTab = () => {
             })
 
             if(res.data.success){
-                console.log("Video upload response:",res.data);
                 const videoInfo = {
                     videoUrl: res.data.data.url,
                     publicId: res.data.data.public_id,
                 };
-                console.log("Video upload info:",videoInfo);
                 setUploadVideoInfo(videoInfo);
                
                 toast.success(res.data.message);
             }
 
         } catch (error) {
-            // console.log(error);
+            console.log(error);
             toast.error('Video upload failed');
         }
         finally{
