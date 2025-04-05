@@ -21,6 +21,11 @@ const CreateLecture = () => {
   const dispatch = useDispatch();
 
   const createLectureHandler = async () => {
+    if (!lectureTitle.trim()) {
+      toast.error("Lecture title cannot be empty");
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await axios.post(
@@ -35,9 +40,8 @@ const CreateLecture = () => {
       );
       if (res.data.success) {
         toast.success(res.data.message);
-        // Update the lecture state with the newly created lecture
         dispatch(setLecture([...lecture, res.data.lecture]));
-        setLectureTitle(""); // Clear the input field after successful creation
+        setLectureTitle("");
       } else {
         toast.error("Something went wrong");
       }
