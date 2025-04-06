@@ -2,8 +2,10 @@ import Hero from "@/components/Hero";
 import React from "react";
 import { courses } from "./Courses";
 import CourseCard from "@/components/CourseCard";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+  const {course}=useSelector((store)=>store.course);
   return (
     <div>
       <Hero />
@@ -16,7 +18,7 @@ const Home = () => {
           experienced learner, we have something for everyone.
         </p>
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {courses.slice(0, 6).map((course, index) => {
+          {course.slice(0, 6).map((course, index) => {
             return <CourseCard key={index} course={course} />;
           })}
         </div>

@@ -1,15 +1,19 @@
 import React from 'react'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const CourseCard = ({course}) => {
+  const navigate=useNavigate();
+  const {user}=useSelector((store)=>store.auth);
   return (
     <Card className='bg-white shadow-lg'>
-      <img src={course.image} alt="" className='w-full h-48 object-cover'/>
+      <img src={course.thumbnail} alt="" className='w-full h-48 object-cover'/>
       <div className='p-6'>
-        <h2 className='text-xl font-semibold text-gray-800 mb-3'>{course.title}</h2>
-        <p className='text-gray-400 mb-4'>{course.description}</p>
-        <Button>Learn More</Button>
+        <h2 className='text-xl font-semibold text-gray-800 mb-3'>{course.courseTitle}</h2>
+        <p className='text-gray-400 mb-4'>{course.subtitle}</p>
+        <Button onClick={()=>navigate(user?`/courses/${course._id}`:"/login")} >Learn More</Button>
       </div>
     </Card>
   )

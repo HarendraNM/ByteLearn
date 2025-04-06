@@ -1,5 +1,8 @@
+import axios from 'axios'
 import CourseCard from '../components/CourseCard'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { setCourse } from '@/redux/courseSlice'
 
 export const courses=[
     {
@@ -35,6 +38,24 @@ export const courses=[
 ]
 
 const Courses = () => {
+
+  const dispatch=useDispatch();
+  const {course}=useSelector((store)=>store.course);
+  useEffect(()=>{
+    const getAllPublishedCourses=async()=>{
+      try {
+        const res=await axios.get("http://localhost:3000/api/v1/course/published-courses",{
+          withCredentials:true
+        });
+        if(res.data.success){
+          dispatch(setCourse(res.data.courses));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getAllPublishedCourses();
+  })
   return (
     <div className='bg-gray-100 pt-14'>
       <div className='min-h-screen max-w-7xl mx-auto py-10'>
@@ -43,7 +64,7 @@ const Courses = () => {
           <p className='text-center text-gray-600 mb-12'>Explore our wide range of courses.Whether you're a beginner or an experienced learner, we have something for everyone.</p>
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
             {
-              courses?.map((course)=>{
+              course?.map((course)=>{
                 return <CourseCard course={course}/>
               })
             }
