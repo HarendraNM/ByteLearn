@@ -64,7 +64,7 @@ const CreateCourse = () => {
       <div className="mt-10">
         <div>
           <Label className='mb-1'>Title</Label>
-          <Input type="text" value={courseTitle} onChange={(e) => setCourseTitle(e.target.value)} placeholder="Course Name" className="bg-white" />
+          <Input type="text" value={courseTitle} onChange={(e) => setCourseTitle(e.target.value)} placeholder="Course Name" className="w-[180px]  bg-white" />
         </div>
         <div className="mt-4 mb-5">
           <Label className='mb-1'>Category</Label>
